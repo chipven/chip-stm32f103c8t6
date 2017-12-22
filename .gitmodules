@@ -1,0 +1,3 @@
+[submodule "stm32f103c8t6_make"]
+	path = stm32f103c8t6_make
+	url = http://github.com/stm32f103c8t6/stm32f103c8t6_make
