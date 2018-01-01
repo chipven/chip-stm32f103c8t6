@@ -1,5 +1,4 @@
 #include "ven_example_exti.h"
-
 void
 ven_EXTI_init() {
     NVIC->ISER[0] |= 0x40;
