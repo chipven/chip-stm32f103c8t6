@@ -24,7 +24,7 @@ device_24c256_test() {
     d24.protocol_i2c.sda_read =
         (unsigned int *)(0x42000000 + 0x10c08 * 0x20 + 8 * 4);
     device_24c256_writeByte(d24, 0x0005, 0x05);
-    unsigned char data = device_24c256_readByte(d24, 0x0007);
+    unsigned char data = device_24c256_readByte(d24, 0x0001);
 
     struct device_8digi d8;
     d8.chip_74hc595.serialInput =
