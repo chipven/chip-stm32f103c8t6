@@ -4,7 +4,7 @@
 #include "system_util.h"
 void
 device_24c256_test() {
-    system_util_on_72m();
+    on_72m();
     /* enable GPIOB in RCC->APB2ENR register */
     RCC->APB2ENR = 0x00000008;
     /* enable GPIOB pin 8 & 9 to floating mode */

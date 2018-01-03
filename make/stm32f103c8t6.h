@@ -1,6 +1,11 @@
 #ifndef STM32F103C8T6_H
 #define STM32F103C8T6_H
 
+#include "stm32f103c8t6_gpio.h"
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+
 #define __I volatile const /*!< Defines 'read only' permissions */
 #define __O volatile       /*!< Defines 'write only' permissions */
 #define __IO volatile      /*!< Defines 'read / write' permissions */
