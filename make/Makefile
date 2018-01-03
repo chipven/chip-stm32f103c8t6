@@ -16,7 +16,7 @@ C_SOURCES = \
 C_OBJS = $(patsubst %c, %o, $(C_SOURCES))
 
 TARGET = stm32f103c8t6
-DEBUG = 1
+DEBUG = 0
 OPT =
 
 BUILD_DIR = build
@@ -43,14 +43,14 @@ SZ = $(BINPATH)/$(PREFIX)size
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 
-MCU = -mcpu=cortex-m3 -mcpu=cortex-m3 -mthumb
+MCU = -mcpu=cortex-m3 -mthumb
 
 ASFLAGS = $(MCU) $(OPT) -Wall -fdata-sections -ffunction-sections
 CFLAGS = $(MCU) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 
-ifeq ($(DEBUG), 1)
-	CFLAGS += -g -gdwarf-2
-endif
+#ifeq ($(DEBUG), 1)
+	#CFLAGS += -g -gdwarf-2
+#endif
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
@@ -113,7 +113,7 @@ clean:
 # st-flash write
 #######################################
 write: all
-	-st-flash write ./build/stm32f103c8t6.bin 0x08000000
+	-st-flash --reset write ./build/stm32f103c8t6.bin 0x8000000
 
 flash: write
 

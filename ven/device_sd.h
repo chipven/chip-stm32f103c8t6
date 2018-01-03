@@ -10,7 +10,6 @@ typedef struct device_sd {
     u32* miso;
 } Device_sd;
 
-u8
-device_sd_learn(Device_sd sd);
-
+u32
+device_sd_init(Device_sd sd);
 #endif /* __device_mhsd_spi_h_ */

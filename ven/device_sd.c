@@ -22,18 +22,19 @@ device_sd_write(Device_sd sd, u8 Tx) {
     return Rx;
 }
 
-u8
+u32
 device_sd_74_clock(Device_sd sd) {
     *sd.cs = 1;
-    for (u8 i = 0; i < 0xff; i++) {
+    for (u32 i = 0; i < 0xff; i++) {
         *sd.sclk = 0;
         *sd.sclk = 1;
     }
-    return 0;
+    return 0xf0f0ee01;
 }
 
-u8
+u32
 device_sd_CMD0(Device_sd sd) {
+    device_sd_74_clock(sd);
     u32 read;
     device_sd_write(sd, 0x40);
     device_sd_write(sd, 0x00);
@@ -41,20 +42,19 @@ device_sd_CMD0(Device_sd sd) {
     device_sd_write(sd, 0x00);
     device_sd_write(sd, 0x00);
     device_sd_write(sd, 0x95);
-    for (u8 i = 0; i < 0xf; i++) {
-        read = device_sd_write(sd,0xff);
+    for (u32 i = 0; i < 0xf; i++) {
+        read = device_sd_write(sd, 0xff);
         if (read == 1) return read;
     }
-    return read;
+    return 0xf0f0eec0;
 }
 
-u8
+u32
 device_sd_init(Device_sd sd) {
-    device_sd_74_clock(sd);
-    return device_sd_CMD0(sd);
-}
-
-u8
-device_sd_learn(Device_sd sd){
-	return device_sd_init(sd);
+    u32 res;
+    for (u32 i = 0; i < 0xf; i++) {
+        res = device_sd_CMD0(sd);
+        if (res == 0x01) return res;
+    }
+    return res;
 }
