@@ -11,5 +11,5 @@ typedef struct device_sd {
 } Device_sd;
 
 u32
-device_sd_init(Device_sd sd);
+device_sd_learn(Device_sd sd);
 #endif /* __device_mhsd_spi_h_ */

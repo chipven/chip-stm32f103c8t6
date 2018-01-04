@@ -5,6 +5,7 @@
 void
 device_sd_test() {
     on_72m();
+
     RCC->APB2ENR |= 0x00000008;
     GPIOB->CRH = 0x03330083;
     GPIOB->CRL = 0x33000000;
@@ -22,7 +23,7 @@ device_sd_test() {
     sd.mosi = B8_out;
     sd.miso = B9_in;
 
-    u32 res = device_sd_init(sd);
+    u32 res = device_sd_learn(sd);
 
     while (1) {
         device_8digi_show(d8, res);
