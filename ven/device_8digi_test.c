@@ -13,8 +13,9 @@ void device_8digi_show_test()
         (unsigned int *)(0x42000000 + 0x10c0c * 0x20 + 14 * 4);
     d8.number_system = 16;
     d8.type_digital = 1;
+    unsigned int number = 0x20;
     while (1)
     {
-        device_8digi_show(d8, 0x20);
+        device_8digi_show(d8, number);
     }
 }
