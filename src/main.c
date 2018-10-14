@@ -47,9 +47,9 @@ int main()
     RCC->APB1ENR |= 0x1 << 1;   //TIM3EN=1
     TIM3->PSC = 71;
     TIM3->ARR = 103;
-    TIM3->DIER = 0x1 << 0; //UIE=1 允许更新中断
-    TIM3->CR1 |= 0x1 << 7; //允许ARR载入
-    TIM3->CR1 |= 0x1 << 4; //向下计数
+    TIM3->DIER |= 0x1 << 0; //UIE=1 允许更新中断
+    TIM3->CR1 |= 0x1 << 7;  //允许ARR载入
+    TIM3->CR1 |= 0x1 << 4;  //向下计数
 
     while (1)
     {
@@ -127,7 +127,7 @@ void TIM3_IRQHandler()
     }
     if (txCount >= 1 && txCount <= 9)
     {
-        *tx = txBuffer & 0x01;
+        *tx = (txBuffer << 7) >> 7;
         txBuffer >>= 1;
     }
     if (txCount == 10)
