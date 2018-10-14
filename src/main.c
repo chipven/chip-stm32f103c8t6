@@ -51,13 +51,16 @@ int main()
     TIM3->CR1 |= 0x1 << 7;  //允许ARR载入
     TIM3->CR1 |= 0x1 << 4;  //向下计数
 
+    *tx = 1;
     while (1)
     {
+
         // device_8digi_show(d8, ven_tim.acc);
         device_8digi_show(d8, numberToShow);
         if (numberToShow == 0x20118866)
         {
-            send(0x6c);
+            *tx = 0;
+            // send(0x6c);
         }
     }
 }
@@ -134,6 +137,7 @@ void TIM3_IRQHandler()
     {
         *tx = 1;
         TIM3->CR1 &= ~(0x1 << 0);
+        txCount = 0;
     }
     TIM3->SR &= ~(0x1 << 0);
 }
