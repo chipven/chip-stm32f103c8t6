@@ -57,7 +57,7 @@ int main()
         device_8digi_show(d8, numberToShow);
         if (numberToShow == 0x20118866)
         {
-            send(0x1234);
+            send(0x6c);
         }
     }
 }
@@ -135,5 +135,5 @@ void TIM3_IRQHandler()
         *tx = 1;
         TIM3->CR1 &= ~(0x1 << 0);
     }
-    TIM3->SR &= ~(0x1 << 1);
+    TIM3->SR &= ~(0x1 << 0);
 }
