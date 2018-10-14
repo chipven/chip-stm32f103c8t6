@@ -995,6 +995,7 @@ typedef struct {
 #define ADC12_COMMON ((ADC_Common_TypeDef *)ADC1_BASE)
 #define TIM1 ((TIM_TypeDef *)TIM1_BASE)
 #define TIM2 ((TIM_TypeDef *)TIM2_BASE)
+#define TIM3 ((TIM_TypeDef *)TIM3_BASE)
 #define SPI1 ((SPI_TypeDef *)SPI1_BASE)
 #define USART1 ((USART_TypeDef *)USART1_BASE)
 #define SDIO ((SDIO_TypeDef *)SDIO_BASE)

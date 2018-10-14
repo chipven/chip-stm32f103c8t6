@@ -9,27 +9,27 @@
 //     // ven_tim.idle = 1;
 // }
 // #endif // TIM2_IRQHandler_Rewrite
-#ifndef TIM3_IRQHandler_Rewrite
-void TIM3_IRQHandler()
-{
-    ven_tim.idle = 0;
-    TIM2->SR &= 0xfffffffe;
-}
-#endif // TIM2_IRQHandler_Rewrite
-#ifndef TIM4_IRQHandler_Rewrite
-void TIM4_IRQHandler()
-{
-    ven_tim.idle = 0;
-    TIM2->SR &= 0xfffffffe;
-}
-#endif // TIM2_IRQHandler_Rewrite
-#ifndef TIM5_IRQHandler_Rewrite
-void TIM5_IRQHandler()
-{
-    ven_tim.idle = 0;
-    TIM2->SR &= 0xfffffffe;
-}
-#endif // TIM2_IRQHandler_Rewrite
+// #ifndef TIM3_IRQHandler_Rewrite
+// void TIM3_IRQHandler()
+// {
+//     ven_tim.idle = 0;
+//     TIM2->SR &= 0xfffffffe;
+// }
+// #endif // TIM2_IRQHandler_Rewrite
+// #ifndef TIM4_IRQHandler_Rewrite
+// void TIM4_IRQHandler()
+// {
+//     ven_tim.idle = 0;
+//     TIM2->SR &= 0xfffffffe;
+// }
+// #endif // TIM2_IRQHandler_Rewrite
+// #ifndef TIM5_IRQHandler_Rewrite
+// void TIM5_IRQHandler()
+// {
+//     ven_tim.idle = 0;
+//     TIM2->SR &= 0xfffffffe;
+// }
+// #endif // TIM2_IRQHandler_Rewrite
 
 void ven_delay_tim2(unsigned int ms_5000_max)
 {

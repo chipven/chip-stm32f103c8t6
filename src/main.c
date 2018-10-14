@@ -3,6 +3,7 @@
 #include "../ven/system_util.h"
 int numberToShow = 0;
 unsigned char uartBuffer;
+unsigned char txBuffer;
 unsigned int *rx = B1_in;
 unsigned int *tx = B0_out;
 
@@ -33,7 +34,7 @@ int main()
     EXTI->IMR |= 0x1 << 1;
     EXTI->FTSR |= 0x1 << 1;
 
-    //配置一个定时器
+    //配置一个RX定时器
     NVIC->ISER[0] |= 0x10000000;
     RCC->APB1ENR |= 0x00000001;
     TIM2->PSC = 71; //RCC->CFGR == 0x001d040a ? 7199 : 799; // 799 7199
@@ -41,14 +42,27 @@ int main()
     TIM2->DIER = 0x1;
     TIM2->CR1 |= 0x1 << 7;
     TIM2->CR1 |= 0x1 << 4;
+    //配置一个TX定时器
+    NVIC->ISER[0] |= 0x1 << 29; //TIM3中断向量29
+    RCC->APB1ENR |= 0x1 << 1;   //TIM3EN=1
+    TIM3->PSC = 71;
+    TIM3->ARR = 103;
+    TIM3->DIER = 0x1 << 0; //UIE=1 允许更新中断
+    TIM3->CR1 |= 0x1 << 7; //允许ARR载入
+    TIM3->CR1 |= 0x1 << 4; //向下计数
+
     while (1)
     {
         // device_8digi_show(d8, ven_tim.acc);
         device_8digi_show(d8, numberToShow);
+        if (numberToShow == 0x20118866)
+        {
+            send(0x1234);
+        }
     }
 }
 
-//uart 专用计数器
+//uart rx 专用计数器
 int uartCount = 0;
 void TIM2_IRQHandler()
 {
@@ -94,4 +108,32 @@ void EXTI1_IRQHandler()
     EXTI->IMR &= 0x0 << 1;
     //取反外部中断挂起位
     EXTI->PR |= 0x1 << 1;
+}
+
+int txCount = 0;
+void send(int data)
+{
+    txCount = 0;
+    txBuffer = data;
+    TIM3->CR1 |= 0x1 << 0; //开始计数
+}
+
+void TIM3_IRQHandler()
+{
+    txCount++;
+    if (txCount == 0)
+    {
+        *tx = 0;
+    }
+    if (txCount >= 1 && txCount <= 9)
+    {
+        *tx = txBuffer & 0x01;
+        txBuffer >>= 1;
+    }
+    if (txCount == 10)
+    {
+        *tx = 1;
+        TIM3->CR1 &= ~(0x1 << 0);
+    }
+    TIM3->SR &= ~(0x1 << 1);
 }
