@@ -8,13 +8,17 @@ unsigned int *rx = B1_in;
 unsigned int *tx = B0_out;
 unsigned char txCount = 0;
 unsigned char rxCount = 0;
-unsigned char received = 0;
+unsigned char rxReceivedFlag = 0;
+unsigned char txEnd = 1;
+// unsigned char received = 0;
 
 void send(unsigned char data)
 {
-    txCount = 0;
-    txBuffer = data;
-    TIM3->CR1 |= 0x1 << 0; //开始计数
+    if (txCount == 0)
+    {
+        txBuffer = data;
+        TIM3->CR1 |= 0x1 << 0; //开始计数
+    }
 }
 
 int main()
@@ -52,7 +56,7 @@ int main()
     NVIC->ISER[0] |= 0x1 << 28; //开启TIM2中断向量28
     RCC->APB1ENR |= 0x1 << 0;   //TIM2EN=1,开启APB1的TIM2EN
     TIM2->PSC = 71;             //预分频
-    TIM2->ARR = 100;            //预装载
+    TIM2->ARR = 100;           //预装载
     TIM2->DIER = 0x1;           //DMA中断使能寄存器UIE允许更新中断
     TIM2->CR1 |= 0x1 << 7;      //ARPE=1允许自动装载
     TIM2->CR1 |= 0x1 << 4;      //向下计数
@@ -61,7 +65,7 @@ int main()
     NVIC->ISER[0] |= 0x1 << 29; //开启TIM3中断向量29
     RCC->APB1ENR |= 0x1 << 1;   //TIM3EN=1
     TIM3->PSC = 71;             //预分频
-    TIM3->ARR = 100;            //预装载
+    TIM3->ARR = 100;           //预装载
     TIM3->DIER |= 0x1 << 0;     //UIE=1 允许更新中断
     TIM3->CR1 |= 0x1 << 7;      //允许ARR载入
     TIM3->CR1 |= 0x1 << 4;      //向下计数
@@ -70,10 +74,10 @@ int main()
 
     while (1)
     {
-        if (received == 1)
+        if (rxReceivedFlag == 1)
         {
-            send(0x61);
-            received = 0;
+            send(rxBuffer);
+            rxReceivedFlag = 0;
         }
         device_8digi_show(d8, numberToShow);
     }
@@ -100,7 +104,7 @@ void TIM2_IRQHandler()
     if (rxCount == 10)
     {
         // while (*rx != 1)
-        // ;
+        //     ;
         //要显示的内容向左移8位;
         numberToShow <<= 8;
         //把buffer的内容或进最后8位;
@@ -110,7 +114,7 @@ void TIM2_IRQHandler()
         //开启EXTI1使能
         EXTI->IMR |= 0x1 << 1;
         rxCount = 0;
-        received = 1;
+        rxReceivedFlag = 1;
     }
     //改写TIM2更新标志
     TIM2->SR &= ~(1 << 0);
@@ -141,11 +145,7 @@ void TIM3_IRQHandler()
         *tx = txBuffer & 1;
         txBuffer >>= 1;
     }
-    if (txCount >= 10 && txCount<=11)
-    {
-        *tx = 1;
-    }
-    if (txCount == 12)
+    if (txCount >= 10)
     {
         *tx = 1;
         txCount = 0;
