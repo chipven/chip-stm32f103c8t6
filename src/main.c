@@ -31,7 +31,7 @@ void uartInit()
     RCC->APB1ENR |= 0x1 << 0;   //TIM2EN=1,开启APB1的TIM2EN
     TIM2->PSC = 71;             //预分频
     TIM2->ARR = 102;            //预装载
-    TIM2->DIER = 0x1;           //DMA中断使能寄存器UIE允许更新中断
+    TIM2->DIER |= 0x1 << 0;     //DMA中断使能寄存器UIE允许更新中断
     TIM2->CR1 |= 0x1 << 7;      //ARPE=1允许自动装载
     TIM2->CR1 |= 0x1 << 4;      //向下计数
 
