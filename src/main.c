@@ -1,14 +1,12 @@
 #include "main.h"
 #include "../ven/device_8digi_test.h"
 #include "../ven/system_util.h"
-int numberToShow = 0;
 unsigned int *rx = B1_in;
 unsigned int *tx = B0_out;
 unsigned char rxBuffer;
 unsigned char txBuffer;
 unsigned char txCount = 0;
 unsigned char rxCount = 0;
-unsigned char rxReceivedFlag = 0;
 // unsigned char received = 0;
 
 void send(unsigned char data)
@@ -66,16 +64,33 @@ int main()
     TIM3->CR1 |= 0x1 << 7;      //允许ARR载入
     TIM3->CR1 |= 0x1 << 4;      //向下计数
 
-    *tx = 1;
+    // *tx = 1;
 
+    int numberFlag = 0;
     while (1)
     {
-        if (rxReceivedFlag == 1 && txCount == 0)
+        if (rxCount == 8)
+        {
+            numberFlag = 1;
+        }
+        if (rxCount == 9 && numberFlag == 1)
+        {
+            numberFlag = 0;
+            //要显示的内容向左移8位;
+            numberToShow <<= 8;
+            //把buffer的内容或进最后8位;
+            numberToShow |= rxBuffer;
+        }
+        // if (txCount == 0 && rxReceivedFlag == 1)
+        if (txCount == 0 && rxCount == 9)
         {
             send(rxBuffer);
-            rxReceivedFlag = 0;
+            // rxReceivedFlag = 0;
         }
-        device_8digi_show(d8, numberToShow);
+        if (rxCount == 0)
+        {
+            device_8digi_show(d8, numberToShow);
+        }
     }
 }
 
@@ -99,18 +114,14 @@ void TIM2_IRQHandler()
     //如果是第十位,等待停止位;
     if (rxCount == 10)
     {
-        // while (*rx != 1)
-        //     ;
-        //要显示的内容向左移8位;
-        numberToShow <<= 8;
-        //把buffer的内容或进最后8位;
-        numberToShow |= rxBuffer;
+        while (*rx != 1)
+            ;
+
         //关闭TIM2使能
         TIM2->CR1 &= 0x0 << 0;
         //开启EXTI1使能
         EXTI->IMR |= 0x1 << 1;
         rxCount = 0;
-        rxReceivedFlag = 1;
     }
     //改写TIM2更新标志
     TIM2->SR &= ~(1 << 0);
