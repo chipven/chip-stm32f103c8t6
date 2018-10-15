@@ -2,23 +2,19 @@
 #include "../ven/device_8digi_test.h"
 #include "../ven/system_util.h"
 int numberToShow = 0;
-unsigned char rxBuffer;
-unsigned char txBuffer;
 unsigned int *rx = B1_in;
 unsigned int *tx = B0_out;
+unsigned char rxBuffer;
+unsigned char txBuffer;
 unsigned char txCount = 0;
 unsigned char rxCount = 0;
 unsigned char rxReceivedFlag = 0;
-unsigned char txEnd = 1;
 // unsigned char received = 0;
 
 void send(unsigned char data)
 {
-    if (txCount == 0)
-    {
-        txBuffer = data;
-        TIM3->CR1 |= 0x1 << 0; //开始计数
-    }
+    txBuffer = data;
+    TIM3->CR1 |= 0x1 << 0; //开始计数
 }
 
 int main()
@@ -56,7 +52,7 @@ int main()
     NVIC->ISER[0] |= 0x1 << 28; //开启TIM2中断向量28
     RCC->APB1ENR |= 0x1 << 0;   //TIM2EN=1,开启APB1的TIM2EN
     TIM2->PSC = 71;             //预分频
-    TIM2->ARR = 100;           //预装载
+    TIM2->ARR = 100;            //预装载
     TIM2->DIER = 0x1;           //DMA中断使能寄存器UIE允许更新中断
     TIM2->CR1 |= 0x1 << 7;      //ARPE=1允许自动装载
     TIM2->CR1 |= 0x1 << 4;      //向下计数
@@ -65,7 +61,7 @@ int main()
     NVIC->ISER[0] |= 0x1 << 29; //开启TIM3中断向量29
     RCC->APB1ENR |= 0x1 << 1;   //TIM3EN=1
     TIM3->PSC = 71;             //预分频
-    TIM3->ARR = 100;           //预装载
+    TIM3->ARR = 100;            //预装载
     TIM3->DIER |= 0x1 << 0;     //UIE=1 允许更新中断
     TIM3->CR1 |= 0x1 << 7;      //允许ARR载入
     TIM3->CR1 |= 0x1 << 4;      //向下计数
@@ -74,7 +70,7 @@ int main()
 
     while (1)
     {
-        if (rxReceivedFlag == 1)
+        if (rxReceivedFlag == 1 && txCount == 0)
         {
             send(rxBuffer);
             rxReceivedFlag = 0;
