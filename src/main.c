@@ -3,8 +3,8 @@
 #include "../ven/system_util.h"
 unsigned int *rx = B1_in;
 unsigned int *tx = B0_out;
-unsigned char rxBuffer = 0xff;
-unsigned char txBuffer = 0xff;
+unsigned char rxBuffer = 0;
+unsigned char txBuffer = 0;
 unsigned char txCount = 0;
 unsigned char rxCount = 0;
 // unsigned char received = 0;
@@ -65,7 +65,6 @@ int main()
 
     //要显示的数据
     unsigned int numberToShow = 0xff;
-    // send(0xaa);
 
     int numberFlag = 0;
     while (1)
