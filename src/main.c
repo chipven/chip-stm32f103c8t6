@@ -34,6 +34,7 @@ void uartInit()
     TIM2->DIER |= 0x1 << 0;     //DMA中断使能寄存器UIE允许更新中断
     TIM2->CR1 |= 0x1 << 7;      //ARPE=1允许自动装载
     TIM2->CR1 |= 0x1 << 4;      //向下计数
+    TIM2->CR1 |= 0x1 << 0;
 
     //配置一个TX定时器
     NVIC->ISER[0] |= 0x1 << 29; //开启TIM3中断向量29
@@ -43,6 +44,7 @@ void uartInit()
     TIM3->DIER |= 0x1 << 0;     //UIE=1 允许更新中断
     TIM3->CR1 |= 0x1 << 7;      //允许ARR载入
     TIM3->CR1 |= 0x1 << 4;      //向下计数
+    TIM3->CR1 |= 0x1 << 0;      //向下计数
 }
 int main()
 {
@@ -64,7 +66,7 @@ int main()
     d8.chip_74hc595.shiftClock = B14_out;
 
     //要显示的数据
-    unsigned int numberToShow = 0xff;
+    unsigned int numberToShow = 0x00;
 
     int numberFlag = 0;
     while (1)
@@ -80,9 +82,6 @@ int main()
             numberToShow <<= 8;
             //把buffer的内容或进最后8位;
             numberToShow |= rxBuffer;
-        }
-        if (txCount == 0 && rxCount == 9)
-        {
             send(rxBuffer);
         }
         if (rxCount == 0)
@@ -100,8 +99,8 @@ void TIM2_IRQHandler()
     //如果计数器为1 等待*rx的下拉信号
     if (rxCount == 1)
     {
-        while (*rx != 0)
-            ;
+        // while (*rx != 0)
+        ;
     }
     //如果是第2至9位,收取8位rx的信号;
     if (2 <= rxCount && rxCount <= 9)
@@ -120,7 +119,7 @@ void TIM2_IRQHandler()
         rxCount = 0;
     }
     //改写TIM2更新标志
-    TIM2->SR &= ~(1 << 0);
+    TIM2->SR &= ~(0x1 << 0);
 }
 
 void EXTI1_IRQHandler()
