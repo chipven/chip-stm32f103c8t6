@@ -34,8 +34,6 @@ void uartInit()
     TIM2->DIER = 0x1;           //DMA中断使能寄存器UIE允许更新中断
     TIM2->CR1 |= 0x1 << 7;      //ARPE=1允许自动装载
     TIM2->CR1 |= 0x1 << 4;      //向下计数
-    // TIM2->CR1 |= 0x1 << 0;
-    // TIM2->CR1 &= ~(0x1 << 0);
 
     //配置一个TX定时器
     NVIC->ISER[0] |= 0x1 << 29; //开启TIM3中断向量29
@@ -119,7 +117,7 @@ void TIM2_IRQHandler()
             ;
 
         //关闭TIM2使能
-        TIM2->CR1 &= 0x0 << 0;
+        TIM2->CR1 &= ~(0x1 << 0);
         rxCount = 0;
     }
     //改写TIM2更新标志
