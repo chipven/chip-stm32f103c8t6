@@ -2,16 +2,18 @@
 #include "../ven/device_8digi_test.h"
 #include "../ven/system_util.h"
 int numberToShow = 0;
-unsigned char RxBuffer;
-unsigned int TxBuffer;
+unsigned char rxBuffer;
+unsigned char txBuffer;
 unsigned int *rx = B1_in;
 unsigned int *tx = B0_out;
-int txCount = 0;
+unsigned char txCount = 0;
+unsigned char rxCount = 0;
+unsigned char received = 0;
 
-void send(int data)
+void send(unsigned char data)
 {
     txCount = 0;
-    TxBuffer = data;
+    txBuffer = data;
     TIM3->CR1 |= 0x1 << 0; //开始计数
 }
 
@@ -50,7 +52,7 @@ int main()
     NVIC->ISER[0] |= 0x1 << 28; //开启TIM2中断向量28
     RCC->APB1ENR |= 0x1 << 0;   //TIM2EN=1,开启APB1的TIM2EN
     TIM2->PSC = 71;             //预分频
-    TIM2->ARR = 103;            //预装载
+    TIM2->ARR = 100;            //预装载
     TIM2->DIER = 0x1;           //DMA中断使能寄存器UIE允许更新中断
     TIM2->CR1 |= 0x1 << 7;      //ARPE=1允许自动装载
     TIM2->CR1 |= 0x1 << 4;      //向下计数
@@ -59,7 +61,7 @@ int main()
     NVIC->ISER[0] |= 0x1 << 29; //开启TIM3中断向量29
     RCC->APB1ENR |= 0x1 << 1;   //TIM3EN=1
     TIM3->PSC = 71;             //预分频
-    TIM3->ARR = 103;            //预装载
+    TIM3->ARR = 100;            //预装载
     TIM3->DIER |= 0x1 << 0;     //UIE=1 允许更新中断
     TIM3->CR1 |= 0x1 << 7;      //允许ARR载入
     TIM3->CR1 |= 0x1 << 4;      //向下计数
@@ -68,44 +70,47 @@ int main()
 
     while (1)
     {
-
-        // device_8digi_show(d8, ven_tim.acc);
+        if (received == 1)
+        {
+            send(0x61);
+            received = 0;
+        }
         device_8digi_show(d8, numberToShow);
     }
 }
 
 //uart rx 专用计数器
-int uartCount = 0;
 void TIM2_IRQHandler()
 {
     //计数器加1
-    uartCount++;
+    rxCount++;
     //如果计数器为1 等待*rx的下拉信号
-    if (uartCount == 1)
+    if (rxCount == 1)
     {
         while (*rx != 0)
             ;
     }
     //如果是第2至9位,收取8位rx的信号;
-    if (2 <= uartCount && uartCount <= 9)
+    if (2 <= rxCount && rxCount <= 9)
     {
-        RxBuffer >>= 1;
-        RxBuffer |= *rx << 7;
+        rxBuffer >>= 1;
+        rxBuffer |= *rx << 7;
     }
     //如果是第十位,等待停止位;
-    if (uartCount == 10)
+    if (rxCount == 10)
     {
-        while (*rx != 1)
-            ;
+        // while (*rx != 1)
+        // ;
         //要显示的内容向左移8位;
         numberToShow <<= 8;
         //把buffer的内容或进最后8位;
-        numberToShow |= RxBuffer;
+        numberToShow |= rxBuffer;
         //关闭TIM2使能
         TIM2->CR1 &= 0x0 << 0;
         //开启EXTI1使能
         EXTI->IMR |= 0x1 << 1;
-        send(numberToShow);
+        rxCount = 0;
+        received = 1;
     }
     //改写TIM2更新标志
     TIM2->SR &= ~(1 << 0);
@@ -116,12 +121,13 @@ void EXTI1_IRQHandler()
     //打开TIM2定时器
     TIM2->CR1 |= 0x1 << 0;
     //uart计数器归零
-    uartCount = 0;
+    rxCount = 0;
     //关闭EXTI1使能
     EXTI->IMR &= 0x0 << 1;
     //取反外部中断挂起位
     EXTI->PR |= 0x1 << 1;
 }
+
 //tx timer
 void TIM3_IRQHandler()
 {
@@ -132,14 +138,18 @@ void TIM3_IRQHandler()
     }
     if (txCount >= 2 && txCount <= 9)
     {
-        *tx = (TxBuffer << 7) >> 7;
-        TxBuffer >>= 1;
+        *tx = txBuffer & 1;
+        txBuffer >>= 1;
     }
-    if (txCount == 10)
+    if (txCount >= 10 && txCount<=11)
     {
         *tx = 1;
-        TIM3->CR1 &= ~(0x1 << 0);
+    }
+    if (txCount == 12)
+    {
+        *tx = 1;
         txCount = 0;
+        TIM3->CR1 &= ~(0x1 << 0);
     }
     TIM3->SR &= ~(0x1 << 0);
 }
