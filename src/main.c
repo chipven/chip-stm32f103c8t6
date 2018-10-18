@@ -1,6 +1,4 @@
 #include "main.h"
-// #include "../ven/device_8digi_test.h"
-// #include "../ven/system_util.h"
 unsigned int *rx = B1_in;
 unsigned int *tx = B0_out;
 unsigned char rxBuffer = 0;
