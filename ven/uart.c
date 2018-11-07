@@ -18,7 +18,10 @@ void openUart1() {
         NVIC->ISER[1] |= 1 << 5;  //设置usart1的中断向量37-32=5 写在ISER[1]
         RCC->APB2ENR |= 1 << 14;        // USART1EN=1:开启usart1的时钟
         RCC->APB2ENR |= 1 << 2;         // IOPAEN=1:开启GPIOA的时钟
+        RCC->APB2ENR |= 1 << 3;         // IOPBEN=1:开启GPIOB的时钟
+        RCC->APB2ENR |= 1 << 4;         // IOPCEN=1:开启GPIOC的时钟
         GPIOA->CRH = 0x444444b4;        //设置PA9为复用推挽输出
+        GPIOB->CRL = 0x44444444;        //设置PB6为复用推挽输出
         USART1->BRR = (468 << 4) | 12;  //设置BBR=468.75 16*0.75=12
         USART1->CR1 |= 1 << 13;         // UE=1:USART使能
         USART1->CR1 |= 1 << 8;  // PEIE=1:校验错误中断使能（还没判断）
